@@ -41,7 +41,6 @@ for i in extensions.keys():
 
 os.system("zip -r all.zip *.zip")
 
-
 asd = """import requests
 
 url = "https://www.virustotal.com/api/v3/files"
