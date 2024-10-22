@@ -1,3 +1,4 @@
+import hashlib
 import os
 import vt
 import time
@@ -30,22 +31,31 @@ for i in extensions.keys():
 
 print(extensions) 
 
-print('\n'.join(str(i) for i in analyzers))
+#print('\n'.join(str(i) for i in analyzers))
+
+print("The paths is:",extensions)
+for i in extensions.keys():
+    for name in extensions[i]:
+        print(f"zip -r '{name}.zip' '{i+"/"+name}'")
+        os.system(f"zip -r '{name}.zip' '{i+"/"+name}'")
+
+os.system("zip -r all.zip *.zip")
 
 
-asd = """
-import requests
+asd = """import requests
 
 url = "https://www.virustotal.com/api/v3/files"
 
 
 # files = { "file": ("flag", open("/home/amir/.vscode/extensions/blackboxapp.blackbox-1.4.15/out/extension.js", "rb"), "application/octet-stream") }
-files = { "file": ("flag", open("/home/amir/Documents/VSOSH/main.py", "rb"), "application/octet-stream") }
+files = { "file": ("flag", open("all.zip", "rb"), "application/octet-stream") }
 
 headers = {
     "accept": "application/json",
     "x-apikey": "a4e48932eb137e5cdae5919ddd48da57346469abec023330b249069c8de73567"
 }
+
+print("Start upload files")
 
 response = requests.post(url, files=files, headers=headers)
 
@@ -65,6 +75,8 @@ data = eval(response.text)
 url = data["data"]["links"]['self']
 print(url)
 
+print("Sleep some time for getting response")
+
 time.sleep(180)
 
 headers = {
@@ -76,3 +88,17 @@ print("RESPONS ANALYSE")
 print(response.text)
 with open("report", 'w') as f:
     f.write(str(response.text))"""
+
+
+client = vt.Client("a4e48932eb137e5cdae5919ddd48da57346469abec023330b249069c8de73567")
+with open("all.zip", "rb") as f:
+    analysis = client.scan_file(f, wait_for_completion=True)
+
+print(analysis)
+
+with open("report", 'w') as f:
+    f.write(str(analysis))
+
+with open("all.zip", "rb") as f:
+    hash = hashlib.sha1(f.read()).hexdigest()
+file = client.get_object(f"/files/{hash}")
