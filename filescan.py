@@ -35,9 +35,14 @@ for user in users:
             
             try:
                 if len(rash) < 5:
-                    with open(os.path.join(temp_dir, user, ext_name, "file."+rash), 'a') as f:
-                        with open(file, 'rb') as e:
-                            f.write(str(e.read())[2:-1]+"\n")
+                    try:
+                        with open(os.path.join(temp_dir, user, ext_name, "file."+rash), 'a') as f:
+                            with open(file, 'r') as e:
+                                f.write(str(e.read())[2:-1]+"\n")
+                    except:
+                        with open(os.path.join(temp_dir, user, ext_name, "file."+rash), 'a') as f:
+                            with open(file, 'rb') as e:
+                                f.write(str(e.read())[2:-1]+"\n")
                 else:
                     raise  Exception("File name too long")
             except:
