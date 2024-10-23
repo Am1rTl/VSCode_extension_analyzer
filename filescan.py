@@ -148,4 +148,4 @@ for user in users:
 print(ext_hash)
 
 with open("reports", 'w') as f:
-	f.write(str(ext_hash))
+	f.write(str(ext_hash)) 
