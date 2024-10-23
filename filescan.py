@@ -74,55 +74,78 @@ for user in users:
 	
 print(temp_dir)
 
+ext_hash = {}
 
-import requests
+for user in users:
+	ext = subprocess.check_output(['ls', f"{temp_dir}/{user}"]).decode('utf-8').strip().split("\n")
+	for e in ext:
+		path = f"{temp_dir}/{user}/{e}"
+		ext_zips = ext = subprocess.check_output(['ls', path]).decode('utf-8').strip().split("\n")
+		#print(ext_zips)
+		for temp in ext_zips[:]:
+			if not temp.endswith(".zip"):
+				ext_zips.remove(temp)
+		print(ext_zips)
 
-# URL of the API
-url = "https://www.filescan.io/api/scan/file"
+		ext_hash[e] = []
 
-# Prepare the headers
-headers = {
-	"User -Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0",
-	"Accept": "application/json, text/plain, */*",
-	"Accept-Language": "ru,en;q=0.5",
-	"Origin": "https://www.filescan.io",
-	"Referer": "https://www.filescan.io/scan",
-#    "Cookie": "cookieyes-consent=consentid:TnZoWFV4MkpwUERSN3g4TnV3azJUWjNYN0xiNjgxbUo; ...",  # Add your cookies here
-}
+		for zip in ext_zips:
+			zip_path = f"{temp_dir}/{user}/{e}/{zip}"
+			# URL of the API
+			url = "https://www.filescan.io/api/scan/file"
 
-# Prepare the files and data for the request
-files = {
-	'file': ('arch.zip', open(f'{temp_dir}/amir/kiranshah.chatgpt-helper-4.1.0/arch0.zip', 'rb'), 'application/zip'),
-}
+			# Prepare the headers
+			headers = {
+				"User -Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0",
+				"Accept": "application/json, text/plain, */*",
+				"Accept-Language": "ru,en;q=0.5",
+				"Origin": "https://www.filescan.io",
+				"Referer": "https://www.filescan.io/scan",
+			    "Cookie": "cookieyes-consent=consentid:TnZoWFV4MkpwUERSN3g4TnV3azJUWjNYN0xiNjgxbUo; ...",  # Add your cookies here
+			}
 
-data = {
-	'description': '',
-	'tags': '',
-	'password': '',
-	'save_preset': 'false',
-	'propagate_tags': 'true',
-	'is_private': 'false',
-	'skip_whitelisted': 'false',
-	'rapid_mode': 'false',
-	'osint': 'true',
-	'extended_osint': 'true',
-	'extracted_files_osint': 'true',
-	'visualization': 'true',
-	'files_download': 'true',
-	'resolve_domains': 'true',
-	'input_file_yara': 'true',
-	'extracted_files_yara': 'true',
-	'whois': 'true',
-	'ips_meta': 'true',
-	'images_ocr': 'true',
-}
+			# Prepare the files and data for the request
+			files = {
+				'file': (zip, open(zip_path, 'rb'), 'application/zip'),
+			}
 
-# Send the POST request
-response = requests.post(url, headers=headers, files=files, data=data)
+			data = {
+				'description': '',
+				'tags': '',
+				'password': '',
+				'save_preset': 'false',
+				'propagate_tags': 'true',
+				'is_private': 'false',
+				'skip_whitelisted': 'false',
+				'rapid_mode': 'false',
+				'osint': 'true',
+				'extended_osint': 'true',
+				'extracted_files_osint': 'true',
+				'visualization': 'true',
+				'files_download': 'true',
+				'resolve_domains': 'true',
+				'input_file_yara': 'true',
+				'extracted_files_yara': 'true',
+				'whois': 'true',
+				'ips_meta': 'true',
+				'images_ocr': 'true',
+			}
 
-# Print the response
-print(response.status_code)
-print(response.json()['flow_id'])  # Assuming the response is in JSON format
+			# Send the POST request
+			response = requests.post(url, headers=headers, files=files, data=data)
 
-# Close the file handle
-files['file'][1].close()
+			# Print the response
+			#print(response.status_code)
+			#print(response.json()['flow_id'])  # Assuming the response is in JSON format
+			try:
+				ext_hash[e].append(response.json()['flow_id'])
+			except:
+				print(response.text)
+			
+			# Close the file handle	
+			files['file'][1].close()
+
+print(ext_hash)
+
+with open("reports", 'w') as f:
+	f.write(str(ext_hash))
