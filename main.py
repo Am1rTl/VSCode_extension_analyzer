@@ -5,7 +5,8 @@ import time
 
 analyzers = ["https://www.virustotal.com/gui/home/upload","https://opentip.kaspersky.com/","https://www.filescan.io/scan","https://virusscan.jotti.org/","https://manalyzer.org/"]
 
-"""
+
+
 
 users = os.listdir("/home/")
 paths = []
@@ -40,12 +41,10 @@ for i in extensions.keys():
 
 os.system("zip -r all.zip *.zip")
 
-"""
-
 client = vt.Client("a4e48932eb137e5cdae5919ddd48da57346469abec023330b249069c8de73567")
 with open("all.zip", "rb") as f:
     analysis = client.scan_file(f, wait_for_completion=True)
-
+    
 print(analysis)
 
 with open("report", 'w') as f:
@@ -54,3 +53,6 @@ with open("report", 'w') as f:
 with open("all.zip", "rb") as f:
     hash = hashlib.sha1(f.read()).hexdigest()
 file = client.get_object(f"/files/{hash}")
+
+os.system("python parse.py")
+
