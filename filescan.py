@@ -122,7 +122,7 @@ response = requests.post(url, headers=headers, files=files, data=data)
 
 # Print the response
 print(response.status_code)
-print(response.json())  # Assuming the response is in JSON format
+print(response.json()['flow_id'])  # Assuming the response is in JSON format
 
 # Close the file handle
 files['file'][1].close()
