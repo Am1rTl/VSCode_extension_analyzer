@@ -54,5 +54,5 @@ with open("all.zip", "rb") as f:
     hash = hashlib.sha1(f.read()).hexdigest()
 file = client.get_object(f"/files/{hash}")
 
-os.system("python parse.py")
+os.system("python vt_parse.py")
 print("Всё выполнено")
