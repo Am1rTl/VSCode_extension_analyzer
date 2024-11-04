@@ -101,7 +101,7 @@ for user in users:
 				"Accept-Language": "ru,en;q=0.5",
 				"Origin": "https://www.filescan.io",
 				"Referer": "https://www.filescan.io/scan",
-			    "Cookie": "cookieyes-consent=consentid:TnZoWFV4MkpwUERSN3g4TnV3azJUWjNYN0xiNjgxbUo; ...",  # Add your cookies here
+			    #"Cookie": "cookieyes-consent=consentid:TnZoWFV4MkpwUERSN3g4TnV3azJUWjNYN0xiNjgxbUo; ...",  # Add your cookies here
 			}
 
 			# Prepare the files and data for the request
@@ -140,12 +140,65 @@ for user in users:
 			try:
 				ext_hash[e].append(response.json()['flow_id'])
 			except:
-				print(response.text)
-			
-			# Close the file handle	
-			files['file'][1].close()
+				try:
+					zip_path = f"{temp_dir}/{user}/{e}/{zip}"
+					# URL of the API
+					url = "https://www.filescan.io/api/scan/file"
+
+					# Prepare the headers
+					headers = {
+						"User -Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0",
+						"Accept": "application/json, text/plain, */*",
+						"Accept-Language": "ru,en;q=0.5",
+						"Origin": "https://www.filescan.io",
+						"Referer": "https://www.filescan.io/scan",
+						#"Cookie": "cookieyes-consent=consentid:TnZoWFV4MkpwUERSN3g4TnV3azJUWjNYN0xiNjgxbUo; ...",  # Add your cookies here
+					}
+
+					# Prepare the files and data for the request
+					files = {
+						'file': (zip, open(zip_path, 'rb'), 'application/zip'),
+					}
+
+					data = {
+						'description': '',
+						'tags': '',
+						'password': '',
+						'save_preset': 'false',
+						'propagate_tags': 'true',
+						'is_private': 'false',
+						'skip_whitelisted': 'false',
+						'rapid_mode': 'false',
+						'osint': 'true',
+						'extended_osint': 'true',
+						'extracted_files_osint': 'true',
+						'visualization': 'true',
+						'files_download': 'true',
+						'resolve_domains': 'true',
+						'input_file_yara': 'true',
+						'extracted_files_yara': 'true',
+						'whois': 'true',
+						'ips_meta': 'true',
+						'images_ocr': 'true',
+					}
+
+					# Send the POST request
+					response = requests.post(url, headers=headers, files=files, data=data)
+					
+					# Close the file handle	
+					files['file'][1].close()
+
+					ext_hash[e].append(response.json()['flow_id'])
+				except:
+					print("Can`t resend file.")
 
 print(ext_hash)
 
-with open("reports/reports", 'w') as f:
-	f.write(str(ext_hash)) 
+try:
+	with open("reports/filescan_reports", 'w') as f:
+		f.write(str(ext_hash)) 
+except:
+	os.system("touch reports/filescan_reports")
+	with open("reports/filescan_reports", 'w') as f:
+		f.write(str(ext_hash))
+	
