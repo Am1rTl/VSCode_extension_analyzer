@@ -2,6 +2,13 @@ import json
 import time
 import requests
 
+
+def find_key_by_hash(data_dict, target_hash):
+    for key, hashes in data_dict.items():
+        if target_hash in hashes:
+            return key
+    return None
+
 def get_report_by_url(url):
     response = requests.get(f"https://www.filescan.io/api/scan/{flow_id}/report")
     
@@ -18,9 +25,12 @@ with open("reports/filescan_reports", 'r')  as f:
 f.close()
 
 hash_reports = eval(data)
+#print(hash_reports)
+report_name = {}
 
 for name in hash_reports.keys():
-    print(hash_reports[name])
+    report_name[name] = ''
+    #print(hash_reports[name])
 
     for flow_id in hash_reports[name]:
         report = get_report_by_url(f"https://www.filescan.io/api/scan/{flow_id}/report")
@@ -30,10 +40,25 @@ for name in hash_reports.keys():
                 time.sleep(10)
                 report = get_report_by_url(f"https://www.filescan.io/api/scan/{flow_id}/report")
             
-            verdict = report["sourceArchive"]["verdict"]
+            try:
+                verdict = report["sourceArchive"]["verdict"]
+                #print(verdict)
 
-            print(verdict)
+                if verdict != "no_threat" and verdict != "unknown":
+                    if report_name[name] == '':
+                        report_name[name] = verdict
+                    elif report_name[name] == "suspicious":
+                        report_name[name] = verdict
+                    elif report_name[name] == "likely_malicious" and verdict != "malicious":
+                        report_name[name] = verdict
+                    elif verdict == "malicious":
+                        report_name[name] = verdict
+
+            except:
+                continue
 
 
+for name in report_name.keys():
+    if report_name[name] != '':
+        print(f"{name} - {report_name[name]}")
 
-resp = requests.get(f"https://www.filescan.io/api/reports/{report_id}/files")
