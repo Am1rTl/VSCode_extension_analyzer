@@ -26,6 +26,8 @@ print("Suspicious: ", analyze['suspicious'])
 print("Undetected: ", analyze['undetected'])
 print()
 
+#client = vt.Client("a4e48932eb137e5cdae5919ddd48da57346469abec023330b249069c8de73567")
+
 
 zip_hash = {}
 
@@ -61,7 +63,7 @@ for i in hash_analyze.keys():
         print('')
 
         
-
+client.close()
 
 
 
