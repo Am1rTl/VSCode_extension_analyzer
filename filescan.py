@@ -147,5 +147,5 @@ for user in users:
 
 print(ext_hash)
 
-with open("reports", 'w') as f:
+with open("reports/reports", 'w') as f:
 	f.write(str(ext_hash)) 
